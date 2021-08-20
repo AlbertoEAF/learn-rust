@@ -5,3 +5,12 @@
   https://doc.rust-lang.org/book/ch01-03-hello-cargo.html
 
   Compiling with cargo
+
+
+* Notes
+
+  Use cargo to manage projects:
+  - ~cargo new <project-name>~ :: Create new project
+  - ~cargo build [--release]~ :: Build project
+  - ~cargo run~ :: (Build and) run project
+  - ~cargo check~ :: Ensure the project builds (faster than build)
