@@ -1,0 +1,7 @@
+* learn-rust
+ Repo just to store projects to learn Rust.
+
+* Current progress
+  https://doc.rust-lang.org/book/ch01-03-hello-cargo.html
+
+  Compiling with cargo
