@@ -7,7 +7,9 @@
   - guessing game - enums and variants - [[https://doc.rust-lang.org/book/ch02-00-guessing-game-tutorial.html][Guessing game - enums and variants]]
   - [[https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html][Ownership]]
   - [[https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html][Borrowing and references]]
-
+  - [[https://doc.rust-lang.org/book/ch05-01-defining-structs.html][Structs]]
+  - [[https://doc.rust-lang.org/book/ch06-01-defining-an-enum.html][Enums]]
+  - [[https://doc.rust-lang.org/book/ch06-02-match.html][Match control flow operator]]
 
 * Notes
 
@@ -74,12 +76,12 @@
     
     References rules:
     - References do not allow modifying borrowed values, unless they are declared as mutable.
-    - There can be only one mutable reference to a value in a given scope.
     - There can be multiple immutable references to the same value in a given scope.
+    - There can be only one mutable reference to a value in a given scope.
     - Cannot have mutable and immutable references to the same value in a given scope. /Users of immutable references would hate for their values to suddenly change./
     - Scope of a reference goes between its declaration and its last use. /This can happen earlier than the end of scope!/
 
-    The following is then *invalid*:
+    The following example showcases such rules:
     #+begin_src rust
       let mut s = String::from("hello");
 
@@ -94,7 +96,6 @@
       println!("{}", r1); // End `r1` reference scope.
 
       let r4 = &mut s; // Valid. Scope of `r1` ended already.
-      println
     #+end_src
 
 
@@ -102,3 +103,210 @@
     - Two or more pointers access the same data at the same time.
     - At least one of the pointers is being used to write to the data.
     - There's no mechanism being used to synchronize access to the data.
+
+
+    
+** Slice type
+
+   [[https://doc.rust-lang.org/book/ch04-03-slices.html][Slices]]
+   
+   Slices are a type that don't have ownership. They are used to reference a contiguous sequence of elements in a collection.
+
+   They are better than tracking indices to a given string variable as they are kept in sync with the string itself, hence always remain valid.
+
+   
+*** String slice
+    String slices are of type ~str~. Hence, the type ~&str~ is an immutable reference to a string slice, the type used for string literals in Rust code. Hence, ~&str~ is more generic than ~&String~ for function arguments when defining functions.
+
+   To make a function that returns a slice with the first word in a string you'd write:
+
+   #+begin_src rust
+     fn first_word(s: &String) -> &str {
+         let bytes = s.as_bytes();
+
+         for (i, &item) in bytes.iter().enumerate() {
+             if item == b' ' {
+                 return &s[0..i];
+             }
+         }
+
+         &s[..]
+     }
+   #+end_src
+
+   
+*** Other slice types
+
+    String slices are only valid for strings. Other slice types are possible too:
+
+    #+begin_src rust
+      let a = [1, 2, 3, 4, 5];
+
+      let slice = &a[1..3]; // slice type: &[i32]
+
+      assert_eq!(slice, &[2, 3]);
+    #+end_src
+
+
+    
+** Structs
+
+   [[https://doc.rust-lang.org/book/ch05-01-defining-structs.html][Structs]]
+   
+   Like tuples, structs serve to bundle together different pieces of data. But in structs, those members are named.
+
+   Example of struct definition:
+
+   #+begin_src rust
+     struct User {
+         username: String,
+         email: String,
+         sign_in_count: u64,
+         active: bool,
+     }
+   #+end_src
+
+   Example of struct creation and modification:
+
+   #+begin_src rust
+     let mut user1 = User {
+         email: String::from("someone@example.com"),  // Order of fields is not relevant.
+         username: String::from("someusername123"),
+         active: true,
+         sign_in_count: 1,
+     };
+
+     user1.active = false;  // Only works if variable is mutable!
+   #+end_src
+
+
+   Also, one can use *init field shorthand* to initialize struct fields with the same name of the parameter:
+
+   #+begin_src rust
+     fn build_user(email: String, username: String) -> User {
+         User {
+             email: email,
+             username, // using field init shorthand
+             active: true,
+             sign_in_count: 1,
+         }
+     }
+   #+end_src
+
+
+   Or *struct update syntax* to initialize a new struct from the values of another one:
+   #+begin_src rust
+     let user2 = User {
+         email: String::from("another@example.com"),
+         username: String::from("anotherusername567"),
+         ..user1  // Use the remaining fields from `user1`.
+     };
+   #+end_src
+
+
+   
+*** Struct tuples
+
+    Define structs that look like tuples called *tuple structs*. These have different types according to the struct name, instead of the underlying tuple field types, which can be useful for type safety:
+
+    #+begin_src rust
+      struct Color(i32, i32, i32);
+      struct Point(i32, i32, i32);
+
+      let black = Color(0, 0, 0);
+      let origin = Point(0, 0, 0);
+    #+end_src
+
+    
+*** Unit-like structs
+
+    Sometimes it is convenient to define new types that have no data, like ~Unit~. These are called *unit-like structs* and behave similarly to the unit type ~()~. This can be useful to implement new trait types for instance.
+
+
+    
+** Enums
+
+   [[https://doc.rust-lang.org/book/ch06-01-defining-an-enum.html][Enums]]
+   
+   Enums in Rust are very powerful and its variants can even carry data of different types:
+
+   #+begin_src rust
+     enum Message {
+         Quit,  // No data associated.
+         Move { x: i32, y: i32 },  // Includes anonymous struct.
+         Write(String),  // Includes a String.
+         ChangeColor(i32, i32, i32),  // Includes three `i32` values.
+     }
+   #+end_src
+
+   Remember, this defines a type ~Message~, which is not the same as defining four /struct types/.
+
+
+   
+*** Option type
+
+    [[https://doc.rust-lang.org/book/ch06-01-defining-an-enum.html][Option]]
+    
+    Rust does not have *null* values, which is a frequent source of bugs, but easily allows expressing the same idea, of a value being available or missing: ~Option~. It is defined in the standard library as having the variants ~Some(T)~ and ~None~:
+    #+begin_src rust
+      enum Option<T> {  // <T> is a generic type parameter in Rust.
+          Some(T),
+          None,
+      }
+    #+end_src
+
+** Match control flow operator
+
+   [[https://doc.rust-lang.org/book/ch06-02-match.html][Match control flow operator]]
+
+   Rust has a very powerful ~match~ control flow operator that can do destructuring and at the same time ensure all variants are covered, making the code much more robust.
+
+
+   
+** If let
+
+   Based on the ~match~ operator, the ~if let~ syntax allows much simpler code to handle values that match a single pattern, while ignoring the rest.
+
+   Example - use match to execute some code if the value is 3:
+
+   #+begin_src rust
+     let some_u8_value = Some(0u8);
+     match some_u8_value {
+         Some(3) => println!("three"),
+         _ => (),
+     }
+   #+end_src
+
+   As ~match~ is exhaustive, the arm ~_ => ()~ had to be added. By using ~if let~, the code becomes much shorter:
+
+   #+begin_src rust
+     let some_u8_value = Some(0u8);
+     if let Some(3) = some_u8_value {
+         println!("three");
+     }
+   #+end_src
+
+
+   The idea is that the single arm is placed in the ~if let~ expression and if it is a match, the ~if then~ branch is executed. This means processing the alternatives is as simple as adding an ~else~ after the ~if~.
+
+   
+** Packages and crates
+
+   [[https://doc.rust-lang.org/book/ch07-01-packages-and-crates.html][Packages and crates]]
+
+   Important concepts:
+   - A *crate* is a binary or library.
+   - A *package* is one or more crates that provide a set of functionality.
+   - A /package/ contains a /Cargo.toml/ file which describes how to build those crates.
+   - If the module of the crate is either /src/lib.rs/ or /src/main.rs/, the crate becomes a *library* or *binary* crate.
+   - A package must contain:
+     - At least one crate (binary or library)
+     - As many binary crates as desired
+     - At most one library crate
+
+  
+*** Modules - controlling scope and privacy
+
+    [[https://doc.rust-lang.org/book/ch07-02-defining-modules-to-control-scope-and-privacy.html][Modules - Controlling scope and privacy]]
+
+    
