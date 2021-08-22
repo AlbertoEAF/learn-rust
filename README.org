@@ -3,6 +3,8 @@
 
 * Current progress
 
+Currently at [[https://doc.rust-lang.org/book/ch09-00-error-handling.html][Error handling]]
+  
   - Compiling with cargo
   - guessing game - enums and variants - [[https://doc.rust-lang.org/book/ch02-00-guessing-game-tutorial.html][Guessing game - enums and variants]]
   - [[https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html][Ownership]]
