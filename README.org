@@ -2,9 +2,10 @@
  Repo just to store projects to learn Rust.
 
 * Current progress
-  
+
   - Compiling with cargo
   - guessing game - enums and variants - [[https://doc.rust-lang.org/book/ch02-00-guessing-game-tutorial.html][Guessing game - enums and variants]]
+  - [[https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html][Ownership]]
 
 
 * Notes
@@ -12,7 +13,7 @@
 ** Cargo
 
    [[https://doc.rust-lang.org/book/ch01-03-hello-cargo.html][Hello cargo - using cargo]]
-   
+
    Use cargo to manage projects:
    - ~cargo new <project-name>~ :: Create new project
    - ~cargo build [--release]~ :: Build project
@@ -23,9 +24,33 @@
 ** Enums and variants
 
    [[https://doc.rust-lang.org/book/ch02-00-guessing-game-tutorial.html][Guessing game - enums and variants]]
-   
+
    Rust often uses types named ~Results~, which are enumerations
    (enums): a type with a fixed set of values. Each value is called a
    variant.
 
    For ~Result~, variants are ~Ok~ and ~Err~.
+
+
+
+** Ownership
+
+   [[https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html][Ownership]]
+
+   Ownership rules:
+   1. Every /value/ in Rust has a /variable/ that is called its /owner/.
+   2. There can only be one /owner/ at a time.
+   3. When the owner goes out of scope, the value will be dropped.
+
+     Due to borrowing,
+
+     #+begin_src rust
+       let s1 = String::from("hello");
+       let s2 = s1; // After this point, s1 is invalidated (moved), and its value can no longer be borrowed.
+
+       println!("{}, world!", s1); // Error: cannot borrow invalidated / moved variable values.
+     #+end_src
+
+     Rust will never automatically create /deep/ copies of the
+     data. Therefore, automatic copying can always be assumed to be
+     inexpensive in terms of runtime performance.
