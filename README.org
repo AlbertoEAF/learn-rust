@@ -2,15 +2,30 @@
  Repo just to store projects to learn Rust.
 
 * Current progress
-  https://doc.rust-lang.org/book/ch01-03-hello-cargo.html
-
-  Compiling with cargo
+  
+  - Compiling with cargo
+  - guessing game - enums and variants - [[https://doc.rust-lang.org/book/ch02-00-guessing-game-tutorial.html][Guessing game - enums and variants]]
 
 
 * Notes
 
-  Use cargo to manage projects:
-  - ~cargo new <project-name>~ :: Create new project
-  - ~cargo build [--release]~ :: Build project
-  - ~cargo run~ :: (Build and) run project
-  - ~cargo check~ :: Ensure the project builds (faster than build)
+** Cargo
+
+   [[https://doc.rust-lang.org/book/ch01-03-hello-cargo.html][Hello cargo - using cargo]]
+   
+   Use cargo to manage projects:
+   - ~cargo new <project-name>~ :: Create new project
+   - ~cargo build [--release]~ :: Build project
+   - ~cargo run~ :: (Build and) run project
+   - ~cargo check~ :: Ensure the project builds (faster than build)
+
+
+** Enums and variants
+
+   [[https://doc.rust-lang.org/book/ch02-00-guessing-game-tutorial.html][Guessing game - enums and variants]]
+   
+   Rust often uses types named ~Results~, which are enumerations
+   (enums): a type with a fixed set of values. Each value is called a
+   variant.
+
+   For ~Result~, variants are ~Ok~ and ~Err~.
