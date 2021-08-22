@@ -6,6 +6,7 @@
   - Compiling with cargo
   - guessing game - enums and variants - [[https://doc.rust-lang.org/book/ch02-00-guessing-game-tutorial.html][Guessing game - enums and variants]]
   - [[https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html][Ownership]]
+  - [[https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html][Borrowing and references]]
 
 
 * Notes
@@ -42,15 +43,62 @@
    2. There can only be one /owner/ at a time.
    3. When the owner goes out of scope, the value will be dropped.
 
-     Due to borrowing,
 
-     #+begin_src rust
-       let s1 = String::from("hello");
-       let s2 = s1; // After this point, s1 is invalidated (moved), and its value can no longer be borrowed.
 
-       println!("{}, world!", s1); // Error: cannot borrow invalidated / moved variable values.
-     #+end_src
 
-     Rust will never automatically create /deep/ copies of the
-     data. Therefore, automatic copying can always be assumed to be
-     inexpensive in terms of runtime performance.
+*** Move/copy
+      Due to move,
+
+      #+begin_src rust
+        let s1 = String::from("hello"); // Data allocated on heap. Ownership & borrowing comes into play.
+        let s2 = s1; // After this point, s1 is invalidated (moved), and its value can no longer be borrowed.
+
+        println!("{}, world!", s1); // Error: cannot borrow invalidated / moved variable values.
+      #+end_src
+
+      automatic copying can always be assumed to be inexpensive in terms of runtime performance. That is because by design Rust will never automatically create /deep/ copies of the data.
+
+      To /deep/-copy the data, use the commonly called ~clone~ method.
+
+      This is not needed for types with size known at compile-time like integers, that are stored entirely on the stack.
+      For those, as the copy is inexpensive there's no difference between deep and shallow copying, and there would be no aid in invalidating copied variables, hence ~clone~ can be left out.
+      Any variable in Rust with the ~Copy~ annotation (that is for instance placed on types like integers that are stored on the stack). Any type implementing the ~Copy~ trait still leaves the older variable used after assignment. Rust does not allow annotating a type with the ~Copy~ trait if the type implements the ~Drop~ trait. All this is explained [[https://doc.rust-lang.org/book/appendix-03-derivable-traits.html][Appendix C: Derivable traits]].
+
+
+
+*** Borrowing
+
+    [[https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html][Borrowing and references]]
+    
+    Borrowing is done through references. They are useful to avoid moving values back and forth.
+    
+    References rules:
+    - References do not allow modifying borrowed values, unless they are declared as mutable.
+    - There can be only one mutable reference to a value in a given scope.
+    - There can be multiple immutable references to the same value in a given scope.
+    - Cannot have mutable and immutable references to the same value in a given scope. /Users of immutable references would hate for their values to suddenly change./
+    - Scope of a reference goes between its declaration and its last use. /This can happen earlier than the end of scope!/
+
+    The following is then *invalid*:
+    #+begin_src rust
+      let mut s = String::from("hello");
+
+
+      let r1 = &mut s; // Start `r1` reference scope.
+      let r2 = &mut s; // ERROR: two mutable references in the same block.
+
+      {
+          let r3 = &mut s; // Valid, no other references to `s` in this scope.
+      }
+
+      println!("{}", r1); // End `r1` reference scope.
+
+      let r4 = &mut s; // Valid. Scope of `r1` ended already.
+      println
+    #+end_src
+
+
+    The advantage of such restrictions is that Rust can prevent data races at compile time. A data race happens when the three behaviours occur:
+    - Two or more pointers access the same data at the same time.
+    - At least one of the pointers is being used to write to the data.
+    - There's no mechanism being used to synchronize access to the data.
