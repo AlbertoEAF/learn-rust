@@ -1,17 +1,8 @@
-* learn-rust
- Repo just to store projects to learn Rust.
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
+#+TITLE: Learn rust
 
-* Current progress
+Repo just to store projects to learn Rust.
 
-Currently at [[https://doc.rust-lang.org/book/ch09-00-error-handling.html][Error handling]]
-  
-  - Compiling with cargo
-  - guessing game - enums and variants - [[https://doc.rust-lang.org/book/ch02-00-guessing-game-tutorial.html][Guessing game - enums and variants]]
-  - [[https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html][Ownership]]
-  - [[https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html][Borrowing and references]]
-  - [[https://doc.rust-lang.org/book/ch05-01-defining-structs.html][Structs]]
-  - [[https://doc.rust-lang.org/book/ch06-01-defining-an-enum.html][Enums]]
-  - [[https://doc.rust-lang.org/book/ch06-02-match.html][Match control flow operator]]
 
 * Notes
 
@@ -312,3 +303,69 @@ Currently at [[https://doc.rust-lang.org/book/ch09-00-error-handling.html][Error
     [[https://doc.rust-lang.org/book/ch07-02-defining-modules-to-control-scope-and-privacy.html][Modules - Controlling scope and privacy]]
 
     
+** Error handling
+
+   [[https://doc.rust-lang.org/book/ch09-00-error-handling.html][Error handling]]
+
+   Rust has no exception system, and unlike other languages divides errors between recoverable and irrecoverable.
+   Error handling in Rust is an extremely robust and tight system.
+   
+   Recoverable errors are handled with the type ~Result<T,E>~. Irrecoverable errors are thrown with the macro ~panic!~.
+
+   ~Result<T,E>~ has many helper methods. One of these is *~unwrap()~*:
+
+   #+begin_src rust
+     let f = File::open("hello.txt").unwrap();  // Return value (T) or panic! with E.
+   #+end_src
+
+   Alternatively, one can use ~.expect("custom error message")~ instead to specify a message in the resulting ~panic!~ macro call.
+   
+   Another one is the *~?~* after a ~Result~. If the operation is an ~Ok~, the value inside it is returned. Otherwise, the error is returned and cast from that type to the current function return type - if there's a defined conversion for that. Also, if there was an Error, the current function returns it immediately.
+
+   #+begin_src rust
+     fn read_username_from_file() -> Result<String, io::Error> {
+         let mut f = File::open("hello.txt")?;
+         let mut s = String::new();
+         f.read_to_string(&mut s)?;
+         Ok(s)
+     }
+   #+end_src
+
+   which can be made even shorter with *chaining*:
+
+   #+begin_src rust
+     fn read_username_from_file() -> Result<String, io::Error> {  // or simply call std::fs::read_to_string(filepath) ;)
+         let mut s = String::new();
+     
+         File::open("hello.txt")?.read_to_string(&mut s)?;
+     
+         Ok(s)
+     }
+   #+end_src
+
+   
+** Generic Types, Traits, and Lifetimes
+
+   [[https://doc.rust-lang.org/book/ch10-00-generics.html][Generic Types, Traits, and Lifetimes]]
+
+   Generics are heavily inspired on C++ syntax, take a look at this:
+
+   #+begin_src rust
+     fn larger<T>(T x, T y) -> bool {
+         x > y  // compiler will require trait std::cmp::PartialOrd.
+     }
+     
+     fn main() {
+         let a : i32 = 1;
+         let b : i32 = 4;
+     
+         if larger(a, b) {  // Won't compile though. We must restrict to type with std::cmp::PartialOrd.
+             println!("Larger!");
+         }
+     }
+   #+end_src
+
+
+   but traits matter too!
+
+   Anyways, this can of course be used for types as well like custom structs.
