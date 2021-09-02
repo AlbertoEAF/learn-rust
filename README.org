@@ -1,5 +1,7 @@
 #+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
 #+TITLE: Learn rust
+# Allow 6-level deep ToC's:
+#+OPTIONS: H:6
 
 Repo just to store projects to learn Rust.
 
@@ -64,9 +66,9 @@ Repo just to store projects to learn Rust.
 *** Borrowing
 
     [[https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html][Borrowing and references]]
-    
+
     Borrowing is done through references. They are useful to avoid moving values back and forth.
-    
+
     References rules:
     - References do not allow modifying borrowed values, unless they are declared as mutable.
     - There can be multiple immutable references to the same value in a given scope.
@@ -98,16 +100,16 @@ Repo just to store projects to learn Rust.
     - There's no mechanism being used to synchronize access to the data.
 
 
-    
+
 ** Slice type
 
    [[https://doc.rust-lang.org/book/ch04-03-slices.html][Slices]]
-   
+
    Slices are a type that don't have ownership. They are used to reference a contiguous sequence of elements in a collection.
 
    They are better than tracking indices to a given string variable as they are kept in sync with the string itself, hence always remain valid.
 
-   
+
 *** String slice
     String slices are of type ~str~. Hence, the type ~&str~ is an immutable reference to a string slice, the type used for string literals in Rust code. Hence, ~&str~ is more generic than ~&String~ for function arguments when defining functions.
 
@@ -127,7 +129,7 @@ Repo just to store projects to learn Rust.
      }
    #+end_src
 
-   
+
 *** Other slice types
 
     String slices are only valid for strings. Other slice types are possible too:
@@ -141,11 +143,11 @@ Repo just to store projects to learn Rust.
     #+end_src
 
 
-    
+
 ** Structs
 
    [[https://doc.rust-lang.org/book/ch05-01-defining-structs.html][Structs]]
-   
+
    Like tuples, structs serve to bundle together different pieces of data. But in structs, those members are named.
 
    Example of struct definition:
@@ -197,7 +199,7 @@ Repo just to store projects to learn Rust.
    #+end_src
 
 
-   
+
 *** Struct tuples
 
     Define structs that look like tuples called *tuple structs*. These have different types according to the struct name, instead of the underlying tuple field types, which can be useful for type safety:
@@ -210,17 +212,17 @@ Repo just to store projects to learn Rust.
       let origin = Point(0, 0, 0);
     #+end_src
 
-    
+
 *** Unit-like structs
 
     Sometimes it is convenient to define new types that have no data, like ~Unit~. These are called *unit-like structs* and behave similarly to the unit type ~()~. This can be useful to implement new trait types for instance.
 
 
-    
+
 ** Enums
 
    [[https://doc.rust-lang.org/book/ch06-01-defining-an-enum.html][Enums]]
-   
+
    Enums in Rust are very powerful and its variants can even carry data of different types:
 
    #+begin_src rust
@@ -235,11 +237,11 @@ Repo just to store projects to learn Rust.
    Remember, this defines a type ~Message~, which is not the same as defining four /struct types/.
 
 
-   
+
 *** Option type
 
     [[https://doc.rust-lang.org/book/ch06-01-defining-an-enum.html][Option]]
-    
+
     Rust does not have *null* values, which is a frequent source of bugs, but easily allows expressing the same idea, of a value being available or missing: ~Option~. It is defined in the standard library as having the variants ~Some(T)~ and ~None~:
     #+begin_src rust
       enum Option<T> {  // <T> is a generic type parameter in Rust.
@@ -255,7 +257,7 @@ Repo just to store projects to learn Rust.
    Rust has a very powerful ~match~ control flow operator that can do destructuring and at the same time ensure all variants are covered, making the code much more robust.
 
 
-   
+
 ** If let
 
    Based on the ~match~ operator, the ~if let~ syntax allows much simpler code to handle values that match a single pattern, while ignoring the rest.
@@ -282,7 +284,7 @@ Repo just to store projects to learn Rust.
 
    The idea is that the single arm is placed in the ~if let~ expression and if it is a match, the ~if then~ branch is executed. This means processing the alternatives is as simple as adding an ~else~ after the ~if~.
 
-   
+
 ** Packages and crates
 
    [[https://doc.rust-lang.org/book/ch07-01-packages-and-crates.html][Packages and crates]]
@@ -297,19 +299,19 @@ Repo just to store projects to learn Rust.
      - As many binary crates as desired
      - At most one library crate
 
-  
+
 *** Modules - controlling scope and privacy
 
     [[https://doc.rust-lang.org/book/ch07-02-defining-modules-to-control-scope-and-privacy.html][Modules - Controlling scope and privacy]]
 
-    
+
 ** Error handling
 
    [[https://doc.rust-lang.org/book/ch09-00-error-handling.html][Error handling]]
 
    Rust has no exception system, and unlike other languages divides errors between recoverable and irrecoverable.
    Error handling in Rust is an extremely robust and tight system.
-   
+
    Recoverable errors are handled with the type ~Result<T,E>~. Irrecoverable errors are thrown with the macro ~panic!~.
 
    ~Result<T,E>~ has many helper methods. One of these is *~unwrap()~*:
@@ -319,7 +321,7 @@ Repo just to store projects to learn Rust.
    #+end_src
 
    Alternatively, one can use ~.expect("custom error message")~ instead to specify a message in the resulting ~panic!~ macro call.
-   
+
    Another one is the *~?~* after a ~Result~. If the operation is an ~Ok~, the value inside it is returned. Otherwise, the error is returned and cast from that type to the current function return type - if there's a defined conversion for that. Also, if there was an Error, the current function returns it immediately.
 
    #+begin_src rust
@@ -336,36 +338,201 @@ Repo just to store projects to learn Rust.
    #+begin_src rust
      fn read_username_from_file() -> Result<String, io::Error> {  // or simply call std::fs::read_to_string(filepath) ;)
          let mut s = String::new();
-     
+
          File::open("hello.txt")?.read_to_string(&mut s)?;
-     
+
          Ok(s)
      }
    #+end_src
 
-   
+
 ** Generic Types, Traits, and Lifetimes
 
    [[https://doc.rust-lang.org/book/ch10-00-generics.html][Generic Types, Traits, and Lifetimes]]
 
-   Generics are heavily inspired on C++ syntax, take a look at this:
+*** Generics
+
+    Generics are heavily inspired on C++ syntax, take a look:
+
+    #+begin_src rust
+      fn larger<T>(T x, T y) -> bool {
+          x > y  // compiler will require trait std::cmp::PartialOrd.
+      }
+
+      fn main() {
+          let a : i32 = 1;
+          let b : i32 = 4;
+
+          if larger(a, b) {  // Won't compile though. We must restrict to type with std::cmp::PartialOrd.
+              println!("Larger!");
+          }
+      }
+    #+end_src
+
+
+    but traits matter too!
+
+    Anyways, this can of course be used for types as well like custom structs.
+
+*** Traits
+
+    [[https://doc.rust-lang.org/book/ch10-02-traits.html][Traits]], [[https://doc.rust-lang.org/book/appendix-03-derivable-traits.html][Derivable Traits]]
+
+    Traits work similarly to interfaces in other languages. A Trait is the requirement that some given set of methods are implemented.
+    The compiler then ensures that any type annotated with that Trait must have such behaviours defined, with those exact signatures.
+
+    Example:
+    #+begin_src rust
+      pub Trait Summary {
+          fn summarize(&self) -> String;
+      }
+    #+end_src
+
+
+
+**** Implementing a Trait on a Type
+
+     Implementing a Trait on a Type is done still with an ~impl~ block, but instead of being just ~impl Classname { definitions... }~, use instead ~impl Trait for Class { implementations... }~:
+
+      #+begin_src rust
+        pub struct Tweet {
+            pub username: String,
+            pub content: String,
+            pub reply: bool,
+            pub retweet: bool,
+        }
+
+        impl Summary for Tweet {
+            fn summarize(&self) -> String {
+                format!("{}: {}", self.username, self.content)
+            }
+        }
+      #+end_src
+
+
+
+**** Implementing methods that apply to traits
+
+     After defining traits, one can also define methods that operate on objects that implement a given trait:
+     #+NAME: trait_bound_sugar_syntax
+     #+CAPTION: Trait bound sugar syntax.
+     #+begin_src rust
+       pub fn notify(item: &impl Summary) {
+           println!("Breaking news! {}", item.summarize());
+       }
+     #+end_src
+
+**** Trait bounds
+
+     The code above ([[trait_bound_sugar_syntax]]) is syntax sugar for a *Trait Bound*:
+
+     #+begin_src rust
+       pub fn notify<T: Summary>(item: &T) {
+               println!("Breaking news! {}", item.summarize());
+       }
+     #+end_src
+
+
+**** Multiple trait bounds
+
+     Multiple trait bounds can be declared with ~&(impl Summary + Display)~ or where clauses:
+
+     #+begin_src rust
+       fn f<T,U>(t: &T, u: &U) -> i32
+           where T: Display + Clone,
+                 U: Clone + Debug
+           {
+           ...
+     #+end_src
+
+     Of course, ~impl~ can also be used for return types, say ~-> impl Summary~.
+
+     However, the function must always return the same type of object that does implement that trait,
+     and not several different types that happen to implement that trait. For that see the appendix [[https://doc.rust-lang.org/book/ch17-02-trait-objects.html#using-trait-objects-that-allow-for-values-of-different-types][Using Trait Objects That Allow for Values of Different Types]].
+
+     /Also, instead of conditionally implementing a trait for any trait that implements another trait, implementations of traits on a type that satisfies the trait bounds are called *blanket implementations*./
+     For instance, the standard library implements the ~ToString~ trait on any type that implements the ~Display~ trait:
+     #+begin_src rust
+       impl<T: Display> ToString for T {
+           ...
+       }
+     #+end_src
+
+     that's the reason why we can run ~let s = 3.to_string();~, because integers implement ~Display~.
+
+
+** Validating references with lifetimes
+
+   [[https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html][References and lifetimes]]
+
+   Like types, lifetimes are inferred in most cases. Only when the lifetime could be ambiguous are we required to specify it.
+   Lifetimes ensure the actual references used at runtime are valid.
 
    #+begin_src rust
-     fn larger<T>(T x, T y) -> bool {
-         x > y  // compiler will require trait std::cmp::PartialOrd.
-     }
-     
-     fn main() {
-         let a : i32 = 1;
-         let b : i32 = 4;
-     
-         if larger(a, b) {  // Won't compile though. We must restrict to type with std::cmp::PartialOrd.
-             println!("Larger!");
+     {
+         let r;
+
+         {
+             let x = 5;
+             r = &x;
          }
+         // Compilation error here because x's lifetime is over, and r would reference a value that is no longer in scope.
+
+         println!("r: {}", r);
      }
    #+end_src
 
+   The compiler determines if the lifetimes are valid through use of a *borrow checker*.
 
-   but traits matter too!
+   /Also: Rust does not allow null values. Trying to use a variable (like ~r~) before it having a value would result in a compile-time error./
 
-   Anyways, this can of course be used for types as well like custom structs.
+
+*** Lifetime annotation syntax
+
+    Explicit lifetime annotations serve not to modify how long any reference lives, but to tell the borrow checker relationships/constraints between different references' lifetimes.
+
+    The name of a lifetime parameter must start with an apostrophe ='= and is usually very short, like ~'a~:
+    #+begin_src rust
+      &i32        // a reference
+      &'a i32     // a reference with an explicit lifetime
+      &'a mut i32 // a mutable reference with an explicit lifetime
+    #+end_src
+
+    To define equal lifetimes for two variables where both live as long as each other (~'a~) and for the return value for a function that receives two parameters by reference, thus ensuring that even the return is never invalidated (same lifetime as the inputs) would go like this:
+    #+begin_src rust
+      fn longest_string<'a>(x: &'a str, y: &'a str) -> &'a str {
+          if x.len() > y.len() {
+              x
+          } else {
+              y
+          }
+      }
+    #+end_src
+
+    As *lifetime specifications do not modify lifetimes*, in practice this means the *borrow checker will only consider the returned reference valid as long as the smallest of both input references lifetimes*, the only satisfiable way for the compiler to obey such lifetime constraints at compile-time in all possible scenarios[fn:Using only type information. See example in manual where a human could look at the constants and know that when the program runs only one of the branches of the program executes, and hence, the borrow checker will be more "strict" than absolutely needed and reject the program when it was acceptable.].
+
+    The borrow checker is smart enough to also prevent returning references to internal function variables in stack, as they would go out of scope when the function returned. This all means that dangling references are *impossible* in Rust
+
+
+*** Lifetime ellision
+
+    As time passes more lifetime ellision rules (patterns hard-coded into Rust's compiler) might emerge that avoid forcing the user to specify the lifetimes.
+
+
+*** Static lifetime
+
+    There's also the ~'static~ lifetime which is meant for the duration of the program. All string literals have the ~'static~ lifetime since their values are hard-coded in the program's binary, which is always available.
+
+
+
+** How to write tests
+
+   [[https://doc.rust-lang.org/book/ch11-01-writing-tests.html][How to Write Tests - The Rust Programming Language]]
+
+   
+* Case Study 1 - Minigrep - demo app for learning purposes
+
+  [[https://doc.rust-lang.org/book/ch12-01-accepting-command-line-arguments.html][Accepting Command Line Arguments - The Rust Programming Language]]
+
+  
+  current progress: [[https://doc.rust-lang.org/book/ch12-02-reading-a-file.html][Reading a File - The Rust Programming Language]]
