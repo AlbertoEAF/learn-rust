@@ -529,10 +529,14 @@ Repo just to store projects to learn Rust.
 
    [[https://doc.rust-lang.org/book/ch11-01-writing-tests.html][How to Write Tests - The Rust Programming Language]]
 
+
+** Functional language features - Iterators and closures
+
+   [[https://doc.rust-lang.org/book/ch13-00-functional-features.html][Functional Language Features: Iterators and Closures]]
    
 * Case Study 1 - Minigrep - demo app for learning purposes
 
   [[https://doc.rust-lang.org/book/ch12-01-accepting-command-line-arguments.html][Accepting Command Line Arguments - The Rust Programming Language]]
 
   
-  current progress: [[https://doc.rust-lang.org/book/ch12-02-reading-a-file.html][Reading a File - The Rust Programming Language]]
+
