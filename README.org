@@ -540,3 +540,9 @@ Repo just to store projects to learn Rust.
 
   
 
+* Final chapters
+
+  [[https://doc.rust-lang.org/book/ch19-01-unsafe-rust.html][Unsafe Rust]]
+  [[https://doc.rust-lang.org/book/ch19-03-advanced-traits.html][Advanced Traits]]
+
+  
