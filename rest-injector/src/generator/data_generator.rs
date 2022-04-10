@@ -1,9 +1,6 @@
-extern crate threads_pool;
-
-use std::collections::HashMap;
 use serde_json::Value;
+use std::collections::HashMap;
 use std::sync::atomic;
-use std::sync::Arc;
 
 pub struct DatasetGenerator {
     num_features: usize,
@@ -12,6 +9,7 @@ pub struct DatasetGenerator {
 }
 
 type Datapoint = HashMap<String, Value>;
+type Out = String;
 
 impl DatasetGenerator {
     pub fn new(num_features: usize) -> DatasetGenerator {
@@ -21,30 +19,28 @@ impl DatasetGenerator {
             feature_names.push(format!("f_{}", i));
         }
 
-        DatasetGenerator { 
-            num_features, 
-            counter: atomic::AtomicI64::new(0), 
-            feature_names 
+        DatasetGenerator {
+            num_features,
+            counter: atomic::AtomicI64::new(0),
+            feature_names,
         }
     }
 
-    pub fn next(&mut self) -> i64 {
-        self.counter.fetch_add(1, atomic::Ordering::SeqCst)
+    /// Generates the next item in the sequence (iterator-like).
+    pub fn next(&self) -> Out {
+        let value = self.counter.fetch_add(1, atomic::Ordering::SeqCst);
+        self.gen(value)
     }
 
+    /// Generates the ith item in the sequence.
+    pub fn gen(&self, ith: i64) -> Out {
+        let mut data = Datapoint::with_capacity(self.num_features);
 
-    pub fn gen(&self, value: i64) -> String {
-
-        let mut data = Datapoint::with_capacity(self.num_features.try_into().unwrap());
         for f in 0..self.num_features {
-            //let name = format!("f_{}", f);                        
             let name = self.feature_names.get(f).unwrap();
-            data.insert(name.to_string(), Value::from(value));            
+            data.insert(name.to_string(), Value::from(ith));
         }
+
         serde_json::json!(data).to_string()
     }
 }
-
-
-//unsafe impl Send for DatasetGenerator {}
-//unsafe impl Sync for DatasetGenerator {}
