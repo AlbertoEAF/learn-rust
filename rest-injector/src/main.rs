@@ -4,38 +4,39 @@ use threads_pool::*;
 
 mod generator;
 
-use std::time::Instant;
 use std::sync::mpsc;
-use std::thread;
 use std::sync::Arc;
+use std::thread;
 
 fn main() {
-
-    let pool = ThreadPool::new(4);
-
-    let mut generator = Arc::new(generator::data_generator::DatasetGenerator::new(3000));
-
-    const N: i64 = 10000;
+    const N: i64 = 12;  // Increase this if you're not getting the deadlock yet, or run cargo run again until it happens.
     let (tx, rx) = mpsc::channel();
 
-    for i in 0..N {
-        
-        let tx = tx.clone();
+    let tx_producer = tx.clone();
+    let producer_thread = thread::spawn(move || {
+        let pool = ThreadPool::new(4);
+        let generator = Arc::new(generator::data_generator::DatasetGenerator::new(3000));
+        for i in 0..N {
+            println!("Generating #{}", i);
+            let tx_ref = tx_producer.clone();
+            let generator_ref = generator.clone();
+            pool.execute(move || {
+                tx_ref.send(generator_ref.next()).expect("tx failed.");              // This fails!
+                //tx_ref.send(format!(" {}            ", i)).expect("tx failed.");   // This works!
+            })
+            .unwrap();
+        }
 
-        generator.clone().counter.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-        let gen = generator.clone();
-        
-        //let p = generator.next();
-        pool.execute(move || {
-            tx.send(gen.gen(i)).unwrap();                     
-        }).unwrap();
-        
-    }
+        println!("Generator done!");
+    });
 
-    for _ in 0..N {
-        println!("{}", rx.recv().unwrap());
+    println!("-» Consumer consuming!");
+    for j in 0..N {
+        let s = rx.recv().expect("rx failed");
+        println!("-» Consumed #{}:   {} ...     ", j, &s[..10]);
     }
-    
-    
- 
+    println!("Consumer done!!");
+
+    producer_thread.join().unwrap();
+    println!("Success. Exit!");
 }
