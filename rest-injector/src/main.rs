@@ -2,12 +2,13 @@ extern crate threads_pool;
 
 use threads_pool::*;
 
-mod generator;
+pub mod generator;
 
 use std::sync::mpsc;
 use std::sync::Arc;
 use std::thread;
 
+/// Use a generator thread pool and send generated events through a channel to a consumer thread.
 fn main() {
     const N: i64 = 12;  // Increase this if you're not getting the deadlock yet, or run cargo run again until it happens.
     let (tx, rx) = mpsc::channel();

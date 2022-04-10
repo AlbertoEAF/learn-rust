@@ -2,6 +2,8 @@ use serde_json::Value;
 use std::collections::HashMap;
 use std::sync::atomic;
 
+/// Generates specific sequences of events.
+/// Still very basic.
 pub struct DatasetGenerator {
     num_features: usize,
     pub counter: atomic::AtomicI64,
