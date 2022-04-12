@@ -6,12 +6,12 @@ use std::thread;
 
 /// Use a generator thread pool and send generated events through a channel to a consumer thread.
 fn main() {
-    const N: i64 = 25000; // Increase this if you're not getting the deadlock yet, or run cargo run again until it happens.
-    let (tx, rx) = mpsc::sync_channel(1000);
+    const N: i64 = 25000;
+    let (tx, rx) = mpsc::channel();
 
     let producer_thread = thread::spawn(move || {
         let pool = rayon::ThreadPoolBuilder::new()
-            .num_threads(4)
+            .num_threads(6)
             .build()
             .unwrap();
 
@@ -28,7 +28,7 @@ fn main() {
     });
 
     for (j, s) in rx.iter().enumerate() {
-        println!("  -» Consumed #{}:   {} ...     ", j, &s[..10]);
+        println!("  -» Consumed #{}:   {} ...     ", j, &s[..15]);
     }
     println!("  -» Consumer done!!");
 
